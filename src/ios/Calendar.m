@@ -5,7 +5,10 @@
 
 #define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
 
-@implementation Calendar
+@implementation Calendar {
+    __block BOOL accessGranted;
+}
+
 @synthesize eventStore;
 
 #pragma mark Initialisation functions
@@ -19,8 +22,9 @@
 }
 
 - (void)initEventStoreWithCalendarCapabilities {
-    __block BOOL accessGranted = NO;
+    accessGranted = NO;
     eventStore= [[EKEventStore alloc] init];
+
     if([eventStore respondsToSelector:@selector(requestAccessToEntityType:completion:)]) {
         dispatch_semaphore_t sema = dispatch_semaphore_create(0);
         [eventStore requestAccessToEntityType:EKEntityTypeEvent completion:^(BOOL granted, NSError *error) {
@@ -349,7 +353,8 @@
 
     if (calendar == nil) {
         NSString *callbackId = command.callbackId;
-        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Could not find calendar"];
+        NSString *errorMsg = accessGranted ? @"Could not find calendar" : @"Please go Home -> Settings -> Privacy -> Calendars and Enable access for \"ICSC.\"";
+        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorMsg];
         [self writeJavascript:[result toErrorCallbackString:callbackId]];
     } else {
         [self createEventWithCalendar:command calendar:calendar];
