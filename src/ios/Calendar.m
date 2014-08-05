@@ -353,7 +353,7 @@
 
     if (calendar == nil) {
         NSString *callbackId = command.callbackId;
-        NSString *errorMsg = accessGranted ? @"Could not find calendar" : @"Please go Home -> Settings -> Privacy -> Calendars and Enable access for \"ICSC.\"";
+        NSString *errorMsg = accessGranted ? @"Could not find calendar" : @"Permission Denied";
         CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorMsg];
         [self writeJavascript:[result toErrorCallbackString:callbackId]];
     } else {
